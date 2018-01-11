@@ -1,0 +1,22 @@
+{
+  "name": "peppermint",
+  "version": "0.0.2",
+  "description": "coming soon",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaeljwilliams/peppermint.git"
+  },
+  "keywords": [
+    "peppermint"
+  ],
+  "author": "Michael Williams",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/michaeljwilliams/peppermint/issues"
+  },
+  "homepage": "https://github.com/michaeljwilliams/peppermint#readme"
+}
