@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/michaeljwilliams/peppermint/issues"
   },
-  "homepage": "https://github.com/michaeljwilliams/peppermint#readme"
+  "homepage": "https://github.com/michaeljwilliams/peppermint#readme",
+  "dependencies": {
+    "gulp": "^3.9.1"
+  }
 }
