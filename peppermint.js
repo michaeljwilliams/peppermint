@@ -10,22 +10,25 @@ function arrFlatten(arr) {
     }, []);
 }
 
-function compilePepfile(stringWithPep, context, options) {
+/* fileWithPep: A stringified file of html mixed with pep
+ * context: Data to be used during compilation.
+ * options: Compiler options
+ */
+function compilePepfile(fileWithPep, context, options) {
     // Split pepString at double curly braces with semicolons {{; ;}} into an array of pep fragments and strings of html.
     // Pep fragments will start with ";" because we didn't capture that in the split.
-    let splitPepInHtml = stringWithPep.split(/\{{2}(?=;)|;\}{2}/gm);
+    let splitPepInHtml = fileWithPep.split(/\{{2}(?=;)|;\}{2}/gm);
 
     let toEval = "" // Container for all the js that will be evaluated.
-
-    // The parsed pep file. md5 hash of "peppermint".
-    // This variable name needs to be very unique because it will interact with the user's code.
-    let bdcf1d20c5115a42c6ee39029562e82e = [];
+    let result = []; // The parsed pep file.
 
     splitPepInHtml.forEach( (str, fileIndex, arr) => {
 
         if(str[0] === ";") {                // If the first char is a semicolon, it should be a pep fragment.
-            bdcf1d20c5115a42c6ee39029562e82e[fileIndex] = [];  // Contains the result expressions in this fragment
-            let parsedFragment = [];        // Contains all the expressions in this fragment
+            //result[fileIndex] = [];     // Contains the result expressions in this fragment of the file
+            let parsedFragment = [];    // Contains html expressions in the pep
+
+            str = `bdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${str}`;
 
             // Split pep fragment at double curly braces {{ }} into an array of fragments of pure js and html-with-js.
             // html fragments should start with "<"
@@ -40,12 +43,24 @@ function compilePepfile(stringWithPep, context, options) {
 
             toEval += parsedFragment.join(""); // Collect js to be evaluated
 
-        } else bdcf1d20c5115a42c6ee39029562e82e[fileIndex] = str;
+        } else result[fileIndex] = str;
     });
 
-    eval(toEval); // Evaluate all the js we collected in the file.
+    // Prepend str with: define arr to hold result
+    // Append to str: return result arr
+    toEval = `const bdcf1d20c5115a42c6ee39029562e82e = [];\n${toEval}\nreturn bdcf1d20c5115a42c6ee39029562e82e;`;
 
-    return arrFlatten(bdcf1d20c5115a42c6ee39029562e82e).join(""); // The compiled file
+    let evaluate = new Function(toEval); // Evaluate all the js we collected in the file.
+    let evaluated = evaluate(); // Evaluation result
+
+    // Fill in the empty indices in result[] with the corresponding value in evaluated[]
+    for(let i = 0, l = result.length; i < l; i++) {
+        if(!result[i] && evaluated[i].length > 0) {
+            result[i] = evaluated[i];
+        }
+    }
+
+    return arrFlatten(result).join(""); // The compiled file
 }
 
 
