@@ -54,16 +54,19 @@ let correctResult = `
 function testCompilePepfile(pepfile, correctResult) {
     console.log("\nTesting compilePepfile...");
 
-    let result = compilePepfile(pepfile);
-
-    if(result === correctResult) {
-        console.log("Passed.\n");
-    } else {
-        console.log("Failed.\n");
+    try {
+        let result = compilePepfile(pepfile);
+        if(result === correctResult) {
+            console.log("Passed.\n");
+        } else {
+            console.log("Failed.\n");
+        }
+        console.log("Result:\n");
+        console.log(result);
+    } catch(e) {
+        console.log("Failed with error:");
+        console.log(e)
     }
-
-    console.log("Result:\n");
-    console.log(result);
 }
 
 testCompilePepfile(pepfile, correctResult);
