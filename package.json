@@ -1,25 +1,28 @@
 {
-  "name": "peppermint",
-  "version": "0.0.3",
-  "description": "coming soon",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/michaeljwilliams/peppermint.git"
-  },
-  "keywords": [
-    "peppermint"
-  ],
-  "author": "Michael Williams",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/michaeljwilliams/peppermint/issues"
-  },
-  "homepage": "https://github.com/michaeljwilliams/peppermint#readme",
-  "dependencies": {
-    "gulp": "^3.9.1"
-  }
+    "name": "peppermint",
+    "version": "0.5.0",
+    "description": "Refreshing HTML templating with JavaScript (alpha)",
+    "main": "index.js",
+    "scripts": {
+        "test": "node test/test.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/michaeljwilliams/peppermint.git"
+    },
+    "keywords": [
+        "peppermint",
+        "pep",
+        "template",
+        "templating",
+        "html",
+        "gulp"
+    ],
+    "author": "Michael Williams",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/michaeljwilliams/peppermint/issues"
+    },
+    "homepage": "https://github.com/michaeljwilliams/peppermint#readme",
+    "dependencies": {}
 }

@@ -1,14 +1,21 @@
 // {{; js ;}}
 // {{ html in js }}
+// /^<([^\s>]+)/gm match beginning of html tag and capture tag: "li" is captured from <li>
 
 // const gulp = require("gulp");
 // const file = gulp.src("./sample.html")
+
+module.exports = exports = compilePepfile;
 
 function arrFlatten(arr) {
     return arr.reduce( (flat, toFlatten) => {
         return flat.concat(Array.isArray(toFlatten) ? arrFlatten(toFlatten) : toFlatten);
     }, []);
 }
+
+
+
+
 
 /* fileWithPep: A stringified file of html mixed with pep
  * context: Data to be used during compilation.
@@ -17,7 +24,7 @@ function arrFlatten(arr) {
 function compilePepfile(fileWithPep, context, options) {
     // Split pepString at double curly braces with semicolons {{; ;}} into an array of pep fragments and strings of html.
     // Pep fragments will start with ";" because we didn't capture that in the split.
-    let splitPepInHtml = fileWithPep.split(/\{{2}(?=;)|;\}{2}/gm);
+    const splitPepInHtml = fileWithPep.split(/\{{2}(?=;)|;\}{2}/gm);
 
     let toEval = "" // Container for all the js that will be evaluated.
     let result = []; // The parsed pep file.
@@ -32,7 +39,7 @@ function compilePepfile(fileWithPep, context, options) {
 
             // Split pep fragment at double curly braces {{ }} into an array of fragments of pure js and html-with-js.
             // html fragments should start with "<"
-            let splitHtmlInPep = str.split(/\{{2}\s+|\}{2}/gm);
+            const splitHtmlInPep = str.split(/\{{2}\s+|\}{2}/gm);
 
             splitHtmlInPep.forEach( (str, fragmentIndex, arr) => {
                 if(str[0] === "<") {            // If the first char is a less-than, it should be a string of html.
@@ -50,8 +57,8 @@ function compilePepfile(fileWithPep, context, options) {
     // Append to str: return result arr
     toEval = `const bdcf1d20c5115a42c6ee39029562e82e = [];\n${toEval}\nreturn bdcf1d20c5115a42c6ee39029562e82e;`;
 
-    let evaluate = new Function(toEval); // Evaluate all the js we collected in the file.
-    let evaluated = evaluate(); // Evaluation result
+    const evaluate = new Function(toEval); // Evaluate all the js we collected in the file.
+    const evaluated = evaluate(); // Evaluation result
 
     // Fill in the empty indices in result[] with the corresponding value in evaluated[]
     for(let i = 0, l = result.length; i < l; i++) {
@@ -62,11 +69,3 @@ function compilePepfile(fileWithPep, context, options) {
 
     return arrFlatten(result).join(""); // The compiled file
 }
-
-
-
-module.exports = exports = compilePepfile;
-
-
-// /^<([^\s>]+)/gm match beginning of html tag and capture tag: "li" is captured from <li>
-// /\n{2}(?:<)|(?:>)\n{2}/gm separate at double newline and < or >

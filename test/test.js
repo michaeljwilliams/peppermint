@@ -1,39 +1,12 @@
-let compilePepfile = require('../peppermint.js');
+const fs = require("fs");
+const compilePepfile = require("../index.js");
 
+const filename = "mint";
+const inputFile = `${__dirname}/${filename}.pep`;
+const inputFileContents = fs.readFileSync(inputFile, "utf8");
 
-
-let pepfile = '\n\
-<div>\n\
-    <ol>\n\
-        {{;\n\
-            let user = "Michael";\n\
-            if(user) {\n\
-                {{\n\
-                    <p>Hello ${ user }</p>\n\
-                }}\n\
-            }\n\
-            let users = [\n\
-                "Michael"\n\
-                ,"Matthew"\n\
-                ,"Alexander"\n\
-            ];\n\
-            for(let i = 0; i < 3; i++) {\n\
-                {{\n\
-                    <li>\n\
-                        <p>User ${i}: <strong>${ users[i] }</strong></p>\n\
-                    </li>\n\
-                }}\n\
-            }\n\
-        ;}}\n\
-    </ol>\n\
-    {{;\n\
-        {{ <p>Goodbye ${ user }</p> }}\n\
-    ;}}\n\
-</div>\n\
-';
-
-let correctResult = `
-<div>
+const correctResult = 
+`<div>
     <ol>
         <p>Hello Michael</p>
                 <li>
@@ -48,25 +21,34 @@ let correctResult = `
                 
     </ol>
     <p>Goodbye Michael</p> 
-</div>
-`;
+</div>`;
 
 function testCompilePepfile(pepfile, correctResult) {
-    console.log("\nTesting compilePepfile...");
+    console.log(`\nTesting compilePepfile...\nInput file: ${inputFile}`);
 
     try {
-        let result = compilePepfile(pepfile);
+        const result = compilePepfile(pepfile);
         if(result === correctResult) {
-            console.log("Passed.\n");
+            console.log("Passed.\nCompilation result:\n");
+            console.log(result);
+
+            const outputFile = `${__dirname}/${filename}.html`;
+            try {
+                fs.writeFileSync(outputFile, result, "utf8");
+                console.log(`\nResult successfully written to ${outputFile}.`);
+            } catch(e) {
+                console.log(`\nFailed to write result to ${outputFile}. Error: ${e}`);
+            }
         } else {
-            console.log("Failed.\n");
+            console.log("Failed. Compiled result does not match correct result.\nCompilation result:\n");
+            console.log(result);
+            console.log("\n\n\nCorrect result:\n");
+            console.log(correctResult);
         }
-        console.log("Result:\n");
-        console.log(result);
     } catch(e) {
-        console.log("Failed with error:");
-        console.log(e)
+        console.log("Error: Compilation failed with error: " + e);
     }
+
 }
 
-testCompilePepfile(pepfile, correctResult);
+testCompilePepfile(inputFileContents, correctResult);
