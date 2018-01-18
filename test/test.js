@@ -8,19 +8,23 @@ const inputFileContents = fs.readFileSync(inputFile, "utf8");
 const correctResult = 
 `<div>
     <ol>
-        <p>Hello Michael</p>
-                <li>
+        
+                    <p>Hello Michael</p>
+                
+                    <li>
                         <p>User 0: <strong>Michael</strong></p>
                     </li>
-                <li>
+                
+                    <li>
                         <p>User 1: <strong>Matthew</strong></p>
                     </li>
-                <li>
+                
+                    <li>
                         <p>User 2: <strong>Alexander</strong></p>
                     </li>
                 
     </ol>
-    <p>Goodbye Michael</p> 
+     <p>Goodbye William</p> 
 </div>`;
 
 function testCompilePepfile(pepfile, correctResult) {

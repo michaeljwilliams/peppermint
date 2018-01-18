@@ -1,4 +1,3 @@
-// {{; js ;}}
 // {{ html in js }}
 // /^<([^\s>]+)/gm match beginning of html tag and capture tag: "li" is captured from <li>
 
@@ -21,25 +20,24 @@ function arrFlatten(arr) {
  * context: Data to be used during compilation.
  * options: Compiler options
  */
-function compileWithPep(fileWithPep, context, options) {
-    // Split pepString at double curly braces with semicolons {{; ;}} into an array of pep fragments and strings of html.
-    // Pep fragments will start with ";" because we didn't capture that in the split.
+function compilePepfile(fileWithPep, context, options) {
+    // Split file string at double curly braces {{_ _}} into an array of pep fragments and strings of html.
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // NEGATED LOOKAHEAD FOR ESCAPE SEQUENCE. CAPTURE THE LAST CHAR IF IT'S SPECIAL. TRY CHARACTER SETS INSTEAD (PROBABLY FASTER)
-    const splitFile = fileWithPep.split(/\{\{(?!%)|\}\}\)|\}\}\]|\}\}&|\}\}\}|\}\}!/gm);
+    const splitFile = fileWithPep.split(/\{\{(?=\()|\{\{(?=\[)|\{\{(?=&)|\)\}\}|\]\}\}|&\}\}/gm);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    let toEval = "" // Container for all the js that will be evaluated.
+    let toEval = ""; // Container for all the js that will be evaluated.
     let result = []; // The parsed pep file.
 
-    splitFile.forEach( (fstr, fileIndex, arr) => {
-        const firstCharFileString = fstr[0]; // Cache this because we'll need to check it multiple times
+    splitFile.forEach( (fileFragment, fileIndex, arr) => {
+        const firstCharFileFragment = fileFragment[0]; // Cache this because we'll need to check it multiple times
 
-        switch(firstCharFileString) {
+        switch(firstCharFileFragment) {
 
             /* {{( )}} js in independent scope
              * Input: js
@@ -53,32 +51,31 @@ function compileWithPep(fileWithPep, context, options) {
              * Output: js evaluated in the scope of the current file
              */
             case "[": {
+                fileFragment = fileFragment.substring(1); // Delete the template char
                 // If true, string should be a pep fragment.
-                //result[fileIndex] = [];           // Contains the result expressions in this fragment of the file
                 let parsedFragment = [];            // Contains html expressions in the pep
 
-                if(firstCharFileString === "(") {                // js executed in independent scope
+                if(firstCharFileFragment === "(") {                // js executed in independent scope
                     // Give it its own scope by enclosing it in an immediately invoked function
-                    fstr = `(function(){\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${fstr}\n})();`;
+                    fileFragment = `(function(){\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${fileFragment}\n})();`;
                 } else {    // firstChar === "["   js exected in file scope
-                    fstr = `bdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${fstr}`;
+                    fileFragment = `bdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${fileFragment}`;
                 }
+                // Split pep at double curly braces {{_ _}} into an array of fragments of pure js and html-with-js.
+                const splitPep = fileFragment.split(/\{\{(?=\{)|\{\{(?=!)|\}\}\}|!\}\}/gm);
 
-                // Split pep fragment at double curly braces {{ }} into an array of fragments of pure js and html-with-js.
-                // html fragments should start with "<"
-                const splitPep = fstr.split(/\{\{|\}\}\}|!\}\}/gm);
-
-                splitPep.forEach( (pstr, fragmentIndex, arr) => {
-                    const firstCharPepString = pstr[0]; // Cache this in case we want to check it multiple times
-                    switch(firstCharPepString) {
+                splitPep.forEach( (pepFragment, pepIndex, arr) => {
+                    const firstCharPepFragment = pepFragment[0]; // Cache this in case we want to check it multiple times
+                    switch(firstCharPepFragment) {
 
                         /* {{{ }}} Unescaped html
                          * Input: html with js expressions
                          * Output: Unescaped html with values of resolved expressions
                          */
                         case "{": {
+                            pepFragment = pepFragment.substring(1); // Delete the template char
                             // Modify html into a js expression and push it into the fragment array with the other js.
-                            parsedFragment[fragmentIndex] = `bdcf1d20c5115a42c6ee39029562e82e[${fileIndex}].push(\`${pstr}\`);`;
+                            parsedFragment[pepIndex] = `bdcf1d20c5115a42c6ee39029562e82e[${fileIndex}].push(\`${pepFragment}\`);`;
                             break;
                         }
 
@@ -87,9 +84,10 @@ function compileWithPep(fileWithPep, context, options) {
                          * Output: Escaped html with values of resolved expressions
                          */
                         case "!": {
+                            pepFragment = pepFragment.substring(1); // Delete the template char
                             // Modify html into a js expression and push it into the fragment array with the other js.
                             // >>> TO-DO: escape html in the string below
-                            //parsedFragment[fragmentIndex] = `bdcf1d20c5115a42c6ee39029562e82e[${fileIndex}].push(\`${pstr}\`);`;
+                            //parsedFragment[pepIndex] = `bdcf1d20c5115a42c6ee39029562e82e[${fileIndex}].push(\`${pepFragment}\`);`;
                             break;
                         }
 
@@ -98,12 +96,13 @@ function compileWithPep(fileWithPep, context, options) {
                          * Ouput: Parsed pepfile result
                          */
                         case "&": {
+                            pepFragment = pepFragment.substring(1); // Delete the template char
                             break;
                         }
 
                         // Plain js is just pushed to the array.
                         default: {
-                            result[fileIndex] = pstr;
+                            parsedFragment[pepIndex] = pepFragment;
                             break;
                         }
                     }
@@ -117,23 +116,24 @@ function compileWithPep(fileWithPep, context, options) {
              * Input: Path to another pepfile, context, options
              * Ouput: Parsed pepfile result
              */
-            case "&": {
+            case "&": {                
+                fileFragment = fileFragment.substring(1); // Delete the template char
                 break;
             }
 
             // Plain html is just pushed to the array
             default: {
-                else result[fileIndex] = fstr;
+                result[fileIndex] = fileFragment;
                 break;
             }
         }
     });
 
-    /* Prepend fstr with: define arr to hold result
-     * Append to fstr: return result arr
+    /* Prepend fileFragment with: define arr to hold result
+     * Append to fileFragment: return result arr
      * Finally, give it its own scope by enclosing it in an immediately invoked function
      */
-    toEval = `(function(){\nconst bdcf1d20c5115a42c6ee39029562e82e = [];\n${toEval}\nreturn bdcf1d20c5115a42c6ee39029562e82e;\n}();`;
+    toEval = `return (function(){\nconst bdcf1d20c5115a42c6ee39029562e82e = [];\n${toEval}\nreturn bdcf1d20c5115a42c6ee39029562e82e;\n})();`;
 
     const evaluate = new Function(toEval); // Evaluate all the js we collected in the file.
     const evaluated = evaluate(); // Evaluation result
