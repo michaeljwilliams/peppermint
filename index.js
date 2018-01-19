@@ -22,14 +22,7 @@ function arrFlatten(arr) {
  */
 function compilePepfile(fileWithPep, context, options) {
     // Split file string at double curly braces {{_ _}} into an array of pep fragments and strings of html.
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// NEGATED LOOKAHEAD FOR ESCAPE SEQUENCE. TRY CHARACTER SETS INSTEAD (PROBABLY FASTER)
     const splitFile = fileWithPep.split(/\{\{(?=\()|\{\{(?=\[)|\{\{(?=&)|\)\}\}|\]\}\}|&\}\}/gm);
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
     let toEval = ""; // Container for all the js that will be evaluated.
     let result = []; // The parsed pep file.
@@ -56,8 +49,10 @@ function compilePepfile(fileWithPep, context, options) {
                 let parsedFragment = [];            // Contains html expressions in the pep
 
                 if(firstCharFileFragment === "(") {                // js executed in independent scope
-                    // Give it its own scope by enclosing it in an immediately invoked function
+                    // Give it its own scope by enclosing it in an immediately invoked function.
                     fileFragment = `\n(function(){\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${fileFragment}\n})();`;
+                    // bdcf1d20c5115a42c6ee39029562e82e is the md5 of "peppermint". This value needs to be very unique so that
+                    // it doesn't mess with the user's code.
                 } else {    // firstChar === "["   js exected in file scope
                     fileFragment = `\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${fileFragment}`;
                 }
