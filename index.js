@@ -17,7 +17,7 @@ function arrFlatten(arr) {
 
 
 /* fileWithPep: A stringified file of html mixed with pep
- * context: Data to be used during compilation.
+ * context: Data that is passed to the template code being compiled.
  * options: Compiler options
  */
 function compilePepfile(fileWithPep, context, options) {
@@ -25,7 +25,7 @@ function compilePepfile(fileWithPep, context, options) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// NEGATED LOOKAHEAD FOR ESCAPE SEQUENCE. CAPTURE THE LAST CHAR IF IT'S SPECIAL. TRY CHARACTER SETS INSTEAD (PROBABLY FASTER)
+// NEGATED LOOKAHEAD FOR ESCAPE SEQUENCE. TRY CHARACTER SETS INSTEAD (PROBABLY FASTER)
     const splitFile = fileWithPep.split(/\{\{(?=\()|\{\{(?=\[)|\{\{(?=&)|\)\}\}|\]\}\}|&\}\}/gm);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,9 +57,9 @@ function compilePepfile(fileWithPep, context, options) {
 
                 if(firstCharFileFragment === "(") {                // js executed in independent scope
                     // Give it its own scope by enclosing it in an immediately invoked function
-                    fileFragment = `(function(){\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${fileFragment}\n})();`;
+                    fileFragment = `\n(function(){\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${fileFragment}\n})();`;
                 } else {    // firstChar === "["   js exected in file scope
-                    fileFragment = `bdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${fileFragment}`;
+                    fileFragment = `\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${fileFragment}`;
                 }
                 // Split pep at double curly braces {{_ _}} into an array of fragments of pure js and html-with-js.
                 const splitPep = fileFragment.split(/\{\{(?=\{)|\{\{(?=!)|\}\}\}|!\}\}/gm);
@@ -75,7 +75,7 @@ function compilePepfile(fileWithPep, context, options) {
                         case "{": {
                             pepFragment = pepFragment.substring(1); // Delete the template char
                             // Modify html into a js expression and push it into the fragment array with the other js.
-                            parsedFragment[pepIndex] = `bdcf1d20c5115a42c6ee39029562e82e[${fileIndex}].push(\`${pepFragment}\`);`;
+                            parsedFragment[pepIndex] = `\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}].push(\`${pepFragment}\`);`;
                             break;
                         }
 
@@ -131,12 +131,11 @@ function compilePepfile(fileWithPep, context, options) {
 
     /* Prepend fileFragment with: define arr to hold result
      * Append to fileFragment: return result arr
-     * Finally, give it its own scope by enclosing it in an immediately invoked function
      */
-    toEval = `return (function(context, options){const bdcf1d20c5115a42c6ee39029562e82e = [];${toEval}\nreturn bdcf1d20c5115a42c6ee39029562e82e;})();`;
+    toEval = `const bdcf1d20c5115a42c6ee39029562e82e = [];${toEval}\nreturn bdcf1d20c5115a42c6ee39029562e82e;`;
 
-    const evaluate = new Function("pepContext", "pepOptions", toEval); // Evaluate all the js we collected in the file.
-    const evaluated = evaluate(context, options); // Evaluation result
+    const evaluate = new Function("__Pep", toEval); // Evaluate all the js we collected in the file.
+    const evaluated = evaluate(context); // Evaluation result
 
     // Fill in the empty indices in result[] with the corresponding value in evaluated[]
     for(let i = 0, l = result.length; i < l; i++) {
