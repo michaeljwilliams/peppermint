@@ -133,10 +133,10 @@ function compilePepfile(fileWithPep, context, options) {
      * Append to fileFragment: return result arr
      * Finally, give it its own scope by enclosing it in an immediately invoked function
      */
-    toEval = `return (function(){\nconst bdcf1d20c5115a42c6ee39029562e82e = [];\n${toEval}\nreturn bdcf1d20c5115a42c6ee39029562e82e;\n})();`;
+    toEval = `return (function(context, options){const bdcf1d20c5115a42c6ee39029562e82e = [];${toEval}\nreturn bdcf1d20c5115a42c6ee39029562e82e;})();`;
 
-    const evaluate = new Function(toEval); // Evaluate all the js we collected in the file.
-    const evaluated = evaluate(); // Evaluation result
+    const evaluate = new Function("pepContext", "pepOptions", toEval); // Evaluate all the js we collected in the file.
+    const evaluated = evaluate(context, options); // Evaluation result
 
     // Fill in the empty indices in result[] with the corresponding value in evaluated[]
     for(let i = 0, l = result.length; i < l; i++) {

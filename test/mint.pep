@@ -22,7 +22,6 @@
         )}}
     </ol>
     {{[
-        let user = "William"
-        {{{ <p>Goodbye ${ user }</p> }}}
+        {{{ <p>Goodbye ${ pepContext.user }</p> }}}
     ]}}
 </div>

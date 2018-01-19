@@ -31,7 +31,7 @@ function testCompilePepfile(pepfile, correctResult) {
     console.log(`\nTesting compilePepfile...\nInput file: ${inputFile}`);
 
     try {
-        const result = compilePepfile(pepfile);
+        const result = compilePepfile(pepfile, {"user": "William"});
         if(result === correctResult) {
             console.log("Passed.\nCompilation result:\n");
             console.log(result);
@@ -50,7 +50,7 @@ function testCompilePepfile(pepfile, correctResult) {
             console.log(correctResult);
         }
     } catch(e) {
-        console.log("Error: Compilation failed with error: " + e);
+        console.log(`Error: Compilation of file ${inputFile} failed with error: ${e}`);
     }
 
 }
