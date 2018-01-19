@@ -6,4 +6,4 @@
 
 Refreshing HTML templating with JavaScript (alpha)
 
-See it on npm: (npmjs.com/package/peppermint)[https://www.npmjs.com/package/peppermint]
+See it on npm: [npmjs.com/package/peppermint](https://www.npmjs.com/package/peppermint)
