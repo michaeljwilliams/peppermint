@@ -3,25 +3,24 @@
     "version": "0.5.0",
     "description": "Refreshing HTML templating with JavaScript (alpha)",
     "main": "index.js",
-    "scripts": {
-        "test": "node test/test.js"
+    "scripts": 
+    {   "test": "node test/test.js"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/michaeljwilliams/peppermint.git"
+    "repository": 
+    {   "type": "git"
+    ,   "url": "git+https://github.com/michaeljwilliams/peppermint.git"
     },
-    "keywords": [
-        "peppermint",
-        "pep",
-        "template",
-        "templating",
-        "html",
-        "gulp"
+    "keywords": 
+    [   "peppermint"
+    ,   "pep"
+    ,   "template"
+    ,   "templating"
+    ,   "html"
     ],
     "author": "Michael Williams",
     "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/michaeljwilliams/peppermint/issues"
+    "bugs": 
+    {   "url": "https://github.com/michaeljwilliams/peppermint/issues"
     },
     "homepage": "https://github.com/michaeljwilliams/peppermint#readme",
     "dependencies": {}
