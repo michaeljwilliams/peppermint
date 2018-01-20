@@ -4,7 +4,7 @@
 // const gulp = require("gulp");
 // const file = gulp.src("./sample.html")
 
-module.exports = exports = compilePepfile;
+module.exports = exports = compilePepString;
 
 function arrFlatten(arr) {
     return arr.reduce( (flat, toFlatten) => {
@@ -16,21 +16,21 @@ function arrFlatten(arr) {
 
 
 
-/* fileWithPep: A stringified file of html mixed with pep
+/* stringWithPep: A stringified file of html mixed with pep
  * context: Data that is passed to the template code being compiled.
  * options: Compiler options
  */
-function compilePepfile(fileWithPep, context, options) {
-    // Split file string at double curly braces {{_ _}} into an array of pep fragments and strings of html.
-    const splitFile = fileWithPep.split(/\{\{(?=\()|\{\{(?=\[)|\{\{(?=&)|\)\}\}|\]\}\}|&\}\}/gm);
+function compilePepString(stringWithPep, context, options) {
+    // Split string at double curly braces {{_ _}} into an array of pep fragments and strings of html.
+    const splitString = stringWithPep.split(/\{\{(?=\()|\{\{(?=\[)|\{\{(?=&)|\)\}\}|\]\}\}|&\}\}/gm);
 
     let toEval = ""; // Container for all the js that will be evaluated.
-    let result = []; // The parsed pep file.
+    let result = []; // Result of parsing the string.
 
-    splitFile.forEach( (fileFragment, fileIndex, arr) => {
-        const firstCharFileFragment = fileFragment[0]; // Cache this because we'll need to check it multiple times
+    splitString.forEach( (stringFragment, fileIndex, arr) => {
+        const stringFragmentFirstChar = stringFragment[0]; // Cache this because we'll need to check it multiple times
 
-        switch(firstCharFileFragment) {
+        switch(stringFragmentFirstChar) {
 
             /* {{( )}} js in independent scope
              * Input: js
@@ -39,29 +39,29 @@ function compilePepfile(fileWithPep, context, options) {
              */
             case "(":
 
-            /* {{[ ]}} js in file scope
+            /* {{[ ]}} js in file/string scope
              * Input: js
-             * Output: js evaluated in the scope of the current file
+             * Output: js evaluated in the scope of the current file/string
              */
             case "[": {
-                fileFragment = fileFragment.substring(1); // Delete the template char
+                stringFragment = stringFragment.substring(1); // Delete the template char
                 // If true, string should be a pep fragment.
-                let parsedFragment = [];            // Contains html expressions in the pep
+                let parsedPepFragment = [];            // Contains html expressions in the pep
 
-                if(firstCharFileFragment === "(") {                // js executed in independent scope
+                if(stringFragmentFirstChar === "(") {                // js executed in independent scope
                     // Give it its own scope by enclosing it in an immediately invoked function.
-                    fileFragment = `\n(function(){\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${fileFragment}\n})();`;
+                    stringFragment = `\n(function(){\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${stringFragment}\n})();`;
                     // bdcf1d20c5115a42c6ee39029562e82e is the md5 of "peppermint". This value needs to be very unique so that
                     // it doesn't mess with the user's code.
                 } else {    // firstChar === "["   js exected in file scope
-                    fileFragment = `\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${fileFragment}`;
+                    stringFragment = `\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}] = [];\n${stringFragment}`;
                 }
                 // Split pep at double curly braces {{_ _}} into an array of fragments of pure js and html-with-js.
-                const splitPep = fileFragment.split(/\{\{(?=\{)|\{\{(?=!)|\}\}\}|!\}\}/gm);
+                const splitPep = stringFragment.split(/\{\{(?=\{)|\{\{(?=!)|\}\}\}|!\}\}/gm);
 
                 splitPep.forEach( (pepFragment, pepIndex, arr) => {
-                    const firstCharPepFragment = pepFragment[0]; // Cache this in case we want to check it multiple times
-                    switch(firstCharPepFragment) {
+                    const pepFragmentFirstChar = pepFragment[0]; // Cache this in case we want to check it multiple times
+                    switch(pepFragmentFirstChar) {
 
                         /* {{{ }}} Unescaped html
                          * Input: html with js expressions
@@ -70,7 +70,7 @@ function compilePepfile(fileWithPep, context, options) {
                         case "{": {
                             pepFragment = pepFragment.substring(1); // Delete the template char
                             // Modify html into a js expression and push it into the fragment array with the other js.
-                            parsedFragment[pepIndex] = `\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}].push(\`${pepFragment}\`);`;
+                            parsedPepFragment[pepIndex] = `\nbdcf1d20c5115a42c6ee39029562e82e[${fileIndex}].push(\`${pepFragment}\`);`;
                             break;
                         }
 
@@ -82,7 +82,7 @@ function compilePepfile(fileWithPep, context, options) {
                             pepFragment = pepFragment.substring(1); // Delete the template char
                             // Modify html into a js expression and push it into the fragment array with the other js.
                             // >>> TO-DO: escape html in the string below
-                            //parsedFragment[pepIndex] = `bdcf1d20c5115a42c6ee39029562e82e[${fileIndex}].push(\`${pepFragment}\`);`;
+                            //parsedPepFragment[pepIndex] = `bdcf1d20c5115a42c6ee39029562e82e[${fileIndex}].push(\`${pepFragment}\`);`;
                             break;
                         }
 
@@ -97,13 +97,13 @@ function compilePepfile(fileWithPep, context, options) {
 
                         // Plain js is just pushed to the array.
                         default: {
-                            parsedFragment[pepIndex] = pepFragment;
+                            parsedPepFragment[pepIndex] = pepFragment;
                             break;
                         }
                     }
                 });
 
-                toEval += parsedFragment.join(""); // Collect js to be evaluated
+                toEval += parsedPepFragment.join(""); // Collect js to be evaluated
                 break;
             }
 
@@ -112,20 +112,20 @@ function compilePepfile(fileWithPep, context, options) {
              * Ouput: Parsed pepfile result
              */
             case "&": {                
-                fileFragment = fileFragment.substring(1); // Delete the template char
+                stringFragment = stringFragment.substring(1); // Delete the template char
                 break;
             }
 
             // Plain html is just pushed to the array
             default: {
-                result[fileIndex] = fileFragment;
+                result[fileIndex] = stringFragment;
                 break;
             }
         }
     });
 
-    /* Prepend fileFragment with: define arr to hold result
-     * Append to fileFragment: return result arr
+    /* Prepend stringFragment with: define arr to hold result
+     * Append to stringFragment: return result arr
      */
     toEval = `const bdcf1d20c5115a42c6ee39029562e82e = [];${toEval}\nreturn bdcf1d20c5115a42c6ee39029562e82e;`;
 
@@ -141,3 +141,5 @@ function compilePepfile(fileWithPep, context, options) {
 
     return arrFlatten(result).join(""); // The compiled file
 }
+
+

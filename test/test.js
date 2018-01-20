@@ -1,5 +1,5 @@
 const fs = require("fs");
-const compilePepfile = require("../index.js");
+const compilePepString = require("../index.js");
 
 const filename = "mint";
 const inputFile = `${__dirname}/${filename}.pep`;
@@ -27,11 +27,11 @@ const correctResult =
      <p>Goodbye William</p> 
 </div>`;
 
-function testCompilePepfile(pepfile, correctResult) {
+function testCompilePepString(pepfile, correctResult) {
     console.log(`\nTesting compilePepfile...\nInput file: ${inputFile}`);
 
     try {
-        const result = compilePepfile(pepfile, {"user": "William"});
+        const result = compilePepString(pepfile, {"user": "William"});
         if(result === correctResult) {
             console.log("Passed.\nCompilation result:\n");
             console.log(result);
@@ -55,4 +55,4 @@ function testCompilePepfile(pepfile, correctResult) {
 
 }
 
-testCompilePepfile(inputFileContents, correctResult);
+testCompilePepString(inputFileContents, correctResult);
