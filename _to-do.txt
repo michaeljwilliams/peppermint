@@ -1,0 +1,13 @@
+TO-DO
+
+- accept and output multiple files in vinyl format
+- evaluate and compile all files at once??? (another level of arrays)
+- error handling
+- lint parsed html and js before evaluating, for better error handling
+- docs
+- evaluate html expression without being in a js split
+- split regex: negated lookahead for escape sequence
+- escape sequence handling
+- split regex: try character sets instead (probably faster)
+- includes (async fetch and compilation)
+- escaped html
