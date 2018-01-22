@@ -2,16 +2,6 @@
 
 module.exports = exports = compilePepString;
 
-function arrFlatten(arr) {
-    return arr.reduce( (flat, toFlatten) => {
-        return flat.concat(Array.isArray(toFlatten) ? arrFlatten(toFlatten) : toFlatten);
-    }, []);
-}
-
-
-
-
-
 /* Parse and compile a string of pep, given specific context and options, and return the result.
  * pepString: A string of text or code, mixed with pep
  * context: Data that is passed to the template code being compiled.
@@ -108,7 +98,7 @@ function compilePepString(pepString, context, options) {
              * Input: Path to another pepfile, context, options
              * Ouput: Parsed pepfile result
              */
-            case "&": {                
+            case "&": {
                 stringFragment = stringFragment.substring(1); // Delete the template char
                 break;
             }
@@ -137,4 +127,12 @@ function compilePepString(pepString, context, options) {
     }
 
     return arrFlatten(result).join(""); // The compiled string
+}
+
+
+
+function arrFlatten(arr) {
+    return arr.reduce( (flat, toFlatten) => {
+        return flat.concat(Array.isArray(toFlatten) ? arrFlatten(toFlatten) : toFlatten);
+    }, []);
 }
