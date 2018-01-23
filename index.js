@@ -10,6 +10,8 @@ let flattenArr = function(arr) {
 };
 
 /**
+ * Include a pepfile. Fetch, parse and compile the file, and return the compiled string.
+ * This is static site generation/server-side only right now.
  * includeString: path to another pepfile, context, compiler options, include options (async bool)
  * Note that context and options will be inherited from the parent compiler, but you can overwrite them.
  * You can set context or options to null if you want them to be inherited and you want to provide values for later args.
