@@ -11,14 +11,14 @@ let flattenArr = function(arr) {
 
 /**
  * includeString: path to another pepfile, context, compiler options, include options (async bool)
- * Note that context and options will be inherited from the parent compiler call, but you can overwrite them.
+ * Note that context and options will be inherited from the parent compiler, but you can overwrite them.
  * You can set context or options to null if you want them to be inherited and you want to provide values for later args.
  */
 let include = function(includeString, _context, _options) {
     const   args = JSON.parse(`[${includeString}]`);
     const   filePath = args[0], // Path is relative to the current working directory
             /**
-             * _context and _options are the values inherited from the parent compiler call.
+             * _context and _options are the values inherited from the parent compiler.
              * We'll use them if context and/or options args aren't provided in the include string.
              */
             context = args[1] || _context,
@@ -109,8 +109,8 @@ let compile = function(pepString, context, options) {
 
                         /**
                          * {{& &}} Include pepfile
-                         * Input: Path to another pepfile, context, options, async bool
-                         * Note that context will be inherited from the parent template, but you can overwrite it.
+                         * Input: string[path to another pepfile, context, options]
+                         * Note that context and options will be inherited from the parent compiler, but you can overwrite them.
                          * Ouput: Parsed pepfile result
                          */
                         case "&": {
@@ -133,8 +133,8 @@ let compile = function(pepString, context, options) {
 
             /**
              * {{& &}} Include pepfile
-             * Input: Path to another pepfile, context, options
-             * Note that context will be inherited from the parent template, but you can overwrite it.
+             * Input: string[path to another pepfile, context, options]
+             * Note that context and options will be inherited from the parent compiler, but you can overwrite them.
              * Ouput: Parsed pepfile result
              */
             case "&": {
