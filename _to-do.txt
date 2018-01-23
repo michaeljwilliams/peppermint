@@ -1,8 +1,8 @@
 to-do:
 
-- includes (async fetch and compilation)
 - use JSON.parse instead of new Function?
-- async include options
+- async includes
+- client-side includes
 - error handling
 - lint parsed html and js before evaluating, for better error handling ?
 - docs
@@ -11,3 +11,4 @@ to-do:
 - split regex: negated lookahead for escape sequence
 - split regex: try character sets instead (probably faster)
 - escaped html
++ synchronous server/static includes
