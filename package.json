@@ -1,6 +1,6 @@
 {
     "name": "peppermint",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "description": "Refreshing HTML templating with JavaScript (alpha)",
     "main": "index.js",
     "scripts": {
