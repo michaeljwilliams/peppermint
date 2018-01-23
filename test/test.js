@@ -4,34 +4,13 @@ const compilePepString = require("../index.js");
 const filename = "mint";
 const inputFile = `${__dirname}/${filename}.pep`;
 const inputFileContents = fs.readFileSync(inputFile, "utf8");
-
-const correctResult = 
-`<div>
-    <ol>
-        
-                    <p>Hello Michael</p>
-                
-                    <li>
-                        <p>User 0: <strong>Michael</strong></p>
-                    </li>
-                
-                    <li>
-                        <p>User 1: <strong>Matthew</strong></p>
-                    </li>
-                
-                    <li>
-                        <p>User 2: <strong>Alexander</strong></p>
-                    </li>
-                
-    </ol>
-     <p>Goodbye William</p> 
-</div>`;
+const correctResult = fs.readFileSync(`${__dirname}/correct.html`, "utf8");
 
 function testCompilePepString(pepfile, correctResult) {
     console.log(`\nTesting compilePepfile...\nInput file: ${inputFile}`);
 
     try {
-        const result = compilePepString(pepfile, {"user": "William"});
+        const result = compilePepString(pepfile, {"user": "Broseidon"});
         if(result === correctResult) {
             console.log("Passed.\nCompilation result:\n");
             console.log(result);

@@ -1,5 +1,4 @@
 <div>
-    {{& "./test/include.pep" &}}
     <ol>
         {{(
             let user = "Michael";
