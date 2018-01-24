@@ -23,5 +23,7 @@
         "url": "https://github.com/michaeljwilliams/peppermint/issues"
     },
     "homepage": "https://github.com/michaeljwilliams/peppermint#readme",
-    "dependencies": {}
+    "dependencies": {
+        "chalk": "^2.3.0"
+    }
 }

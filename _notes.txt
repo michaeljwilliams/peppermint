@@ -1,37 +1,50 @@
 notes:
 
-{{( )}} or {{[ ]}}
-pep - js with html in it. Parsed for html, compiled into js, then evaluatedd
+{{$  $}}
+js expression
+
+{{[ ]}} or {{( )}}
+js with output-strings in it. Parsed for output-strings, compiled into js, then evaluated
 
 {{{ }}}
-html with js expressions in template literal format. 
+output-string with js expressions in template literal format.
 The contents will be converted into a template literal in a statement that adds it to the result.
 
 
 
 Syntax, more specifically:
 
-{{( )}} js in independent scope
-Input: js
-Output: js evaluated in its own scope
+{{$ $}} js expression in file scope
+Input: js expression
+Output: js expression evaluated in file scope
+This value is trimmed of whitespace at the beginning and end before being evaluated.
 
 {{[ ]}} js in file scope
 Input: js
 Output: js evaluated in the scope of the current file
 
-{{{ }}} Unescaped html
-Input: html with js expressions
-Output: Unescaped html with values of resolved expressions
+{{( )}} js in local scope
+Input: js
+Output: js evaluated in local scope (evaluated in its own function)
 
-{{! !}} Escaped html
-Input: html with js expressions
-Output: Escaped html with values of resolved expressions
+Output-strings within js logic tags:
+    Within these tags you can embed js expressions in template literal form: ${expression}
+
+    {{{ }}} Unescaped string
+    Input: string with js expressions in ${}
+    Output: Unescaped string with values of resolved expressions
+
+    {{! !}} html-escaped string
+    Input: html with js expressions
+    Output: Escaped html with values of resolved expressions
 
 {{& &}} Include pepfile
 Input: Path to another pepfile, context, options
 Ouput: Parsed pepfile result
 
 
+
+Compiler context is accessible via __Pep object
 
 engine exposes variables for convenience
     • sitewide variables: site.foo

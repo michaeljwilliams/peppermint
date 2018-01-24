@@ -1,4 +1,5 @@
-const fs = require("fs");
+const   fs = require("fs"),
+        chalk = require('chalk');
 
 // /^<([^\s>]+)/gm match beginning of html tag and capture tag: "li" is captured from <li>
 
@@ -41,7 +42,7 @@ let compile = function(pepString, context, options) {
     options = options || {};
 
     // Split string at double curly braces {{_ _}} into an array of pep fragments and strings of html.
-    const splitString = pepString.split(/\{\{(?=\()|\{\{(?=\[)|\{\{(?=&)|\)\}\}|\]\}\}|&\}\}/gm);
+    const splitString = pepString.split(/\{\{(?=\$)|\{\{(?=\()|\{\{(?=\[)|\{\{(?=&)|\$\}\}|\)\}\}|\]\}\}|&\}\}/gm);
 
     let toEval = ""; // Container for all the js that will be evaluated.
     let result = []; // Result of parsing the string.
@@ -50,6 +51,17 @@ let compile = function(pepString, context, options) {
         const stringFragmentFirstChar = stringFragment[0]; // Cache this because we'll need to check it multiple times
 
         switch(stringFragmentFirstChar) {
+
+            /**
+             * {{$ $}} js expression in file scope
+             * Input: js expression
+             * Output: js expression evaluated in file scope
+             */
+            case "$": {
+                stringFragment = stringFragment.substring(1).trim(); // Delete the template char and trim whitespace
+                toEval += `\nbdcf1d20c5115a42c6ee39029562e82e[${stringIndex}] = ${stringFragment};`;
+                break;
+            }
 
             /**
              * {{( )}} js in independent scope
@@ -67,14 +79,12 @@ let compile = function(pepString, context, options) {
             case "[": {
                 stringFragment = stringFragment.substring(1); // Delete the template char
                 // If true, string should be a pep fragment.
-                let parsedPepFragment = [];            // Contains html expressions in the pep
+                let parsedPepFragment = []; // Contains html expressions in the pep
 
-                if(stringFragmentFirstChar === "(") {                // js executed in independent scope
+                if(stringFragmentFirstChar === "(") { // js executed in independent scope
                     // Give it its own scope by enclosing it in an immediately invoked function.
                     stringFragment = `\n(function(){\nbdcf1d20c5115a42c6ee39029562e82e[${stringIndex}] = [];\n${stringFragment}\n})();`;
-                    // bdcf1d20c5115a42c6ee39029562e82e is the md5 of "peppermint". This value needs to be very unique so that
-                    // it doesn't interfere with the user's code (same variable name).
-                } else {    // firstChar === "["   js exected in file/string scope
+                } else { // first char should be "[" - js in file/string scope
                     stringFragment = `\nbdcf1d20c5115a42c6ee39029562e82e[${stringIndex}] = [];\n${stringFragment}`;
                 }
                 // Split pep at double curly braces {{_ _}} into an array of fragments of pure js and html-with-js.
@@ -154,8 +164,10 @@ let compile = function(pepString, context, options) {
     });
 
     /**
-     * Prepend string with: define arr to hold result
-     * Append to string: return result arr
+     * Prepend string with: define array to hold result
+     * Append to string: return that array
+     * bdcf1d20c5115a42c6ee39029562e82e is the md5 of "peppermint". This value needs to be
+     * very unique so that it doesn't interfere with the user's code (same variable name).
      */
     toEval = `const bdcf1d20c5115a42c6ee39029562e82e = [];${toEval}\nreturn bdcf1d20c5115a42c6ee39029562e82e;`;
 
@@ -164,8 +176,14 @@ let compile = function(pepString, context, options) {
 
     // Fill in the empty indices in result[] with the corresponding value in evaluated[]
     for(let i = 0, l = result.length; i < l; i++) {
-        if(!result[i] && evaluated[i].length > 0) {
-            result[i] = evaluated[i];
+        try {
+            if(!result[i] && evaluated[i]) {
+                result[i] = evaluated[i];
+            }
+        } catch(err) {
+            console.log(`\n${chalk.cyan("peppermint: ")} ${chalk.red("Error: " + err)}
+                \nwhile compiling the following string:\n ${chalk.magenta(pepString)}\nExiting...\n`);
+            return;
         }
     }
 

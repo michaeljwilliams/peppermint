@@ -21,7 +21,5 @@
             }
         )}}
     </ol>
-    {{(
-        {{{ <p>Goodbye ${ __Pep.user }</p> }}}
-    )}}
+    <p>Goodbye {{$ __Pep.user $}}</p>
 </div>
