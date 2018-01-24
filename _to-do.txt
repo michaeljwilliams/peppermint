@@ -4,6 +4,7 @@ to-do:
 - toSrc for includes
 - async includes
 - client-side includes
+- includes: make parent context and current context both available at once
 - error handling
 - lint parsed html and js before evaluating, for better error handling ?
 - docs
