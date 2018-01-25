@@ -170,9 +170,12 @@ let compile = function(pepString, context, options) {
      * very unique so that it doesn't interfere with the user's code (same variable name).
      */
     toEval = `const bdcf1d20c5115a42c6ee39029562e82e = [];${toEval}\nreturn bdcf1d20c5115a42c6ee39029562e82e;`;
-
-    const evaluate = new Function("__Pep", toEval); // Evaluate all the js we collected in the string.
-    const evaluated = evaluate(context); // Evaluation result
+    const evaluate = new Function("__Pep, require", toEval); // Evaluate all the js we collected in the string.
+    const evaluated = evaluate(context, require); // Evaluation result
+    /**
+     * We must explicitly pass require() and other non-global node tools so that they're
+     * available to the evaluated code. require() is a module global.
+     */
 
     // Fill in the empty indices in result[] with the corresponding value in evaluated[]
     for(let i = 0, l = result.length; i < l; i++) {
