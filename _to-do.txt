@@ -1,5 +1,6 @@
 to-do:
 
+- readme link to gulp-peppermint
 - require() passed to evaluated code should automatically add process.cwd() to path
 - includes accept references for path, context, and options
 - toSrc for includes
