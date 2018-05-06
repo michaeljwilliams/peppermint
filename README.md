@@ -6,4 +6,6 @@
 
 Refreshing templating with JavaScript (alpha)
 
+Very simple and powerful. Inspired by JSX and EJS.
+
 See it on npm: [npmjs.com/package/peppermint](https://www.npmjs.com/package/peppermint)
